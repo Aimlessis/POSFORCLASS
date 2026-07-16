@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DolcePOSDummies"
+             x:Class="DolcePOSDummies.IngredientsView">
+
+    <DockPanel Margin="15">
+
+        <!-- Form -->
+        <StackPanel DockPanel.Dock="Bottom" Margin="0,15,0,0" Spacing="10">
+            <WrapPanel>
+                <TextBox x:Name="NombreBox" Watermark="Nombre" Width="200" Margin="0,0,10,10"/>
+                <TextBox x:Name="CantidadBox" Watermark="Cantidad" Width="100" Margin="0,0,10,10"/>
+                <TextBox x:Name="CostoBox" Watermark="Costo" Width="100" Margin="0,0,10,10"/>
+                <DatePicker x:Name="FechaPicker" Width="180" Margin="0,0,10,10"/>
+            </WrapPanel>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button Content="Add" Click="Add_Click"/>
+                <Button Content="Update selected" Click="Update_Click"/>
+                <Button Content="Delete selected" Click="Delete_Click"/>
+                <Button Content="Clear form" Click="ClearForm_Click"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Grid -->
+        <DataGrid x:Name="Grid"
+                  x:DataType="local:Ingrediente"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  GridLinesVisibility="Horizontal"
+                  BorderThickness="1"
+                  BorderBrush="Gray"
+                  SelectionChanged="Grid_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="*"/>
+                <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad}" Width="100"/>
+                <DataGridTextColumn Header="Costo" Binding="{Binding Costo, StringFormat={}{0:C}}" Width="100"/>
+                <DataGridTextColumn Header="Vence" Binding="{Binding FechaVencimiento, StringFormat={}{0:d}}" Width="120"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+    </DockPanel>
+
+</UserControl>

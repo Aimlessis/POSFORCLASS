@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DolcePOSDummies"
+             x:Class="DolcePOSDummies.SalesView">
+
+    <DockPanel Margin="15">
+
+        <!-- Entry row -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,15">
+            <ComboBox x:Name="ProductCombo" Width="260" PlaceholderText="Select a product"/>
+            <TextBox x:Name="QuantityBox" Watermark="Qty" Width="80" Text="1"/>
+            <Button Content="Add" Click="AddItem_Click"/>
+            <Button Content="Remove selected" Click="RemoveItem_Click"/>
+            <Button Content="Clear" Click="ClearItems_Click"/>
+        </StackPanel>
+
+        <!-- Total + checkout row -->
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="15"
+                    HorizontalAlignment="Right" Margin="0,15,0,0">
+            <TextBlock x:Name="TotalText" Text="Total: $0.00" FontSize="22" FontWeight="Bold"
+                       VerticalAlignment="Center"/>
+            <Button Content="Checkout" Click="Checkout_Click" Padding="20,8"/>
+        </StackPanel>
+
+        <!-- Cart grid -->
+        <DataGrid x:Name="SalesGrid"
+                  x:DataType="local:SaleLine"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  GridLinesVisibility="Horizontal"
+                  BorderThickness="1"
+                  BorderBrush="Gray">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Product" Binding="{Binding Nombre}" Width="*"/>
+                <DataGridTextColumn Header="Price" Binding="{Binding Precio, StringFormat={}{0:C}}" Width="120"/>
+                <DataGridTextColumn Header="Qty" Binding="{Binding Cantidad}" Width="80"/>
+                <DataGridTextColumn Header="Subtotal" Binding="{Binding Subtotal, StringFormat={}{0:C}}" Width="120"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+    </DockPanel>
+
+</UserControl>

@@ -1,0 +1,23 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:DolcePOSDummies"
+        x:Class="DolcePOSDummies.MainWindow"
+        Title="DolcePOS - Dummies Edition"
+        Width="1000" Height="650">
+
+    <TabControl>
+        <TabItem Header="Ventas">
+            <local:SalesView/>
+        </TabItem>
+        <TabItem Header="Productos">
+            <local:ProductsView/>
+        </TabItem>
+        <TabItem Header="Clientes">
+            <local:ClientsView/>
+        </TabItem>
+        <TabItem Header="Ingredientes">
+            <local:IngredientsView/>
+        </TabItem>
+    </TabControl>
+
+</Window>
