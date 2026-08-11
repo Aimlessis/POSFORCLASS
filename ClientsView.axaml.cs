@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Npgsql;
+using System.Linq;
 
 namespace DolcePOSDummies
 {
@@ -141,6 +142,20 @@ namespace DolcePOSDummies
             TelefonoBox.Text = c.Telefono;
             DireccionBox.Text = c.Direccion;
             CreditoBox.Text = c.Credito.ToString();
+        }
+
+        private void BuscarBox_TextChanged(object? sender, TextChangedEventArgs e)
+        {
+            string filtro = BuscarBox.Text?.ToLower() ?? "";
+
+            var resultados = _clientes
+                .Where(c =>
+                    c.Nombre.ToLower().Contains(filtro) ||
+                    c.Telefono.ToLower().Contains(filtro) ||
+                    c.Direccion.ToLower().Contains(filtro))
+                .ToList();
+
+            Grid.ItemsSource = resultados;
         }
     }
 }
