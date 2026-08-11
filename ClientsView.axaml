@@ -5,6 +5,12 @@
 
     <DockPanel Margin="15">
 
+        <!-- Barra de búsqueda -->
+        <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Left" Margin="0,0,0,15">
+            <TextBox x:Name="BuscarBox" Watermark="Buscar cliente..." Width="300" TextChanged="BuscarBox_TextChanged"/>
+        </StackPanel>
+
+
         <!-- Form -->
         <StackPanel DockPanel.Dock="Bottom" Margin="0,15,0,0" Spacing="10">
             <WrapPanel>
@@ -14,10 +20,10 @@
                 <TextBox x:Name="CreditoBox" Watermark="Credito" Width="100" Margin="0,0,10,10"/>
             </WrapPanel>
             <StackPanel Orientation="Horizontal" Spacing="10">
-                <Button Content="Add" Click="Add_Click"/>
-                <Button Content="Update selected" Click="Update_Click"/>
-                <Button Content="Delete selected" Click="Delete_Click"/>
-                <Button Content="Clear form" Click="ClearForm_Click"/>
+                <Button Content="Agregar" Click="Add_Click"/>
+                <Button Content="Actualizar seleccionado" Click="Update_Click"/>
+                <Button Content="Eliminar seleccionado" Click="Delete_Click"/>
+                <Button Content="Limpiar Formulario" Click="ClearForm_Click"/>
             </StackPanel>
         </StackPanel>
 

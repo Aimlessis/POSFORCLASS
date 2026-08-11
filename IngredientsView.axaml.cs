@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Npgsql;
+using System.Linq;
 
 namespace DolcePOSDummies
 {
@@ -133,6 +134,18 @@ namespace DolcePOSDummies
             CostoBox.Text = "";
             FechaPicker.SelectedDate = null;
             Grid.SelectedItem = null;
+        }
+
+        private void BuscarIngrediente_TextChanged(object? sender, TextChangedEventArgs e)
+        {
+            string filtro = BuscarIngrediente.Text?.ToLower() ?? "";
+
+            var resultados = _ingredientes
+                .Where(c => 
+                    c.Nombre.ToLower().Contains(filtro))
+                .ToList();
+
+            Grid.ItemsSource = resultados;
         }
 
         private void Grid_SelectionChanged(object? sender, SelectionChangedEventArgs e)

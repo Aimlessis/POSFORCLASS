@@ -10,7 +10,10 @@ namespace DolcePOSDummies
         static ConnectionInfo()
         {
             Env.Load();
-            ConnectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
+
+            var cs = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+            ConnectionString = cs
                 ?? throw new InvalidOperationException("DATABASE_URL no configurada");
         }
     }
