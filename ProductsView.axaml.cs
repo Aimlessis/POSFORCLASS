@@ -1,6 +1,5 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Npgsql;
@@ -34,14 +33,24 @@ namespace DolcePOSDummies
         }
 
 
-        private void UpdateDatagrid(string query = "SELECT id, nombre_producto, costo, precio, cantidad_producto, descuento_max, beneficio, descripcion, categoria FROM productos ORDER BY nombre_producto")
+        private void UpdateDatagrid(string filtro = "")
         {
             _productos.Clear();
+
+            const string baseQuery =
+                "SELECT id, nombre_producto, costo, precio, cantidad_producto, descuento_max, beneficio, descripcion, categoria " +
+                "FROM productos ";
 
             using var conn = new NpgsqlConnection(ConnectionInfo.ConnectionString);
             conn.Open();
 
-            using var cmd = new NpgsqlCommand(query, conn);
+            using NpgsqlCommand cmd = string.IsNullOrWhiteSpace(filtro)
+                ? new NpgsqlCommand(baseQuery + "ORDER BY nombre_producto", conn)
+                : new NpgsqlCommand(baseQuery + "WHERE nombre_producto ILIKE @filtro ORDER BY nombre_producto", conn);
+
+            if (!string.IsNullOrWhiteSpace(filtro))
+                cmd.Parameters.AddWithValue("filtro", $"%{filtro}%");
+
             using var reader = cmd.ExecuteReader();
 
             while (reader.Read())
@@ -69,7 +78,6 @@ namespace DolcePOSDummies
             decimal.TryParse(DescuentoMaxBox.Text, out var descuentoMax);
             decimal.TryParse(BeneficioBox.Text, out var beneficio);
 
-
             using var conn = new NpgsqlConnection(ConnectionInfo.ConnectionString);
             conn.Open();
 
@@ -94,7 +102,6 @@ namespace DolcePOSDummies
             decimal.TryParse(CantidadBox.Text, out var cantidad);
             decimal.TryParse(DescuentoMaxBox.Text, out var descuentoMax);
             decimal.TryParse(BeneficioBox.Text, out var beneficio);
-
 
             using var conn = new NpgsqlConnection(ConnectionInfo.ConnectionString);
             conn.Open();
@@ -154,17 +161,9 @@ namespace DolcePOSDummies
             ClearForm_Click(null, null!);
         }
 
-        private void BuscarProducto_TextChanged(object? sender, TextChangedEventArgs e)
+        private void BusquedaProducto_TextChanged(object? sender, Avalonia.Controls.TextChangedEventArgs e)
         {
-            string filtro = BuscarProducto.Text?.ToLower() ?? "";
-
-            var resultado = _productos
-                .Where(c =>
-                    c.NombreProducto.ToLower().Contains(filtro) ||
-                    c.Categoria.ToLower().Contains(filtro))
-                .ToList();
-                
-            Grid.ItemsSource = resultado;
+            UpdateDatagrid(busqueda_producto.Text ?? "");
         }
 
         private void ClearForm_Click(object? sender, RoutedEventArgs e)
