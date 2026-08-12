@@ -5,13 +5,14 @@
 
     <DockPanel Margin="15">
 
-        <!-- Entry row -->
+        <!-- Header row -->
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,15">
             <ComboBox x:Name="ProductCombo" Width="260" PlaceholderText="Select a product"/>
             <TextBox x:Name="QuantityBox" Watermark="Qty" Width="80" Text="1"/>
-            <Button Content="Add" Click="AddItem_Click"/>
-            <Button Content="Remove selected" Click="RemoveItem_Click"/>
-            <Button Content="Clear" Click="ClearItems_Click"/>
+            <Button Content="Add" Click="AddItem_Click" Padding="10,8" Margin="0,0,5,0"/>
+            <Button Content="Remove selected" Click="RemoveItem_Click" Padding="10,8" Margin="0,0,5,0"/>
+            <Button Content="Clear" Click="ClearItems_Click" Padding="10,8" Margin="0,0,5,0"/>
+            <Button Content="Reportes" Click="ShowReports_Click" Padding="10,8" Margin="0,0,5,0"/>
         </StackPanel>
 
         <!-- Total + checkout row -->
@@ -22,7 +23,7 @@
             <Button Content="Checkout" Click="Checkout_Click" Padding="20,8"/>
         </StackPanel>
 
-        <!-- Cart grid -->
+        <!-- Cart grid — fills remaining space -->
         <DataGrid x:Name="SalesGrid"
                   x:DataType="local:SaleLine"
                   AutoGenerateColumns="False"
@@ -31,13 +32,12 @@
                   BorderThickness="1"
                   BorderBrush="Gray">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Product" Binding="{Binding Nombre}" Width="*"/>
-                <DataGridTextColumn Header="Price" Binding="{Binding Precio, StringFormat={}{0:C}}" Width="120"/>
+                <DataGridTextColumn Header="Producto" Binding="{Binding Nombre}" Width="*"/>
+                <DataGridTextColumn Header="Precio" Binding="{Binding Precio, StringFormat={}{0:C}}" Width="120"/>
                 <DataGridTextColumn Header="Qty" Binding="{Binding Cantidad}" Width="80"/>
                 <DataGridTextColumn Header="Subtotal" Binding="{Binding Subtotal, StringFormat={}{0:C}}" Width="120"/>
             </DataGrid.Columns>
         </DataGrid>
 
     </DockPanel>
-
 </UserControl>

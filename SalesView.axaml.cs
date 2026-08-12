@@ -25,9 +25,9 @@ namespace DolcePOSDummies
         {
             InitializeComponent();
             SalesGrid.ItemsSource = _cart;
+            ProductCombo.DropDownOpened += (s, e) => UpdateDatagrid();
             UpdateDatagrid();
         }
-
 
         private void UpdateDatagrid()
         {
@@ -62,64 +62,65 @@ namespace DolcePOSDummies
         }
 
         private void InsertData()
+{
+    var total = _cart.Sum(l => l.Subtotal);
+
+    using var conn = new NpgsqlConnection(ConnectionInfo.ConnectionString);
+    conn.Open();
+    using var tx = conn.BeginTransaction();
+
+    try
+    {
+        int ventaId;
+        using (var cmd = new NpgsqlCommand(
+            "INSERT INTO ventas (fecha, total, impuesto, descuento) VALUES (@fecha, @total, 0, 0) RETURNING id",
+            conn, tx))
         {
-            var total = _cart.Sum(l => l.Subtotal);
+            cmd.Parameters.AddWithValue("fecha", DateTime.Now);
+            cmd.Parameters.AddWithValue("total", total);
+            ventaId = (int)cmd.ExecuteScalar()!;
+        }
 
-            using var conn = new NpgsqlConnection(ConnectionInfo.ConnectionString);
-            conn.Open();
-            using var tx = conn.BeginTransaction();
-
-            try
+        foreach (var line in _cart)
+        {
+            using (var cmd = new NpgsqlCommand(
+                "INSERT INTO productoxventa (producto_id, ventas_id, cantidad) VALUES (@p, @v, @c)", conn, tx))
             {
-                int ventaId;
-                using (var cmd = new NpgsqlCommand(
-                    "INSERT INTO ventas (fecha, total, impuesto, descuento) VALUES (@fecha, @total, 0, 0) RETURNING id",
-                    conn, tx))
-                {
-                    cmd.Parameters.AddWithValue("fecha", DateTime.Now);
-                    cmd.Parameters.AddWithValue("total", total);
-                    ventaId = (int)cmd.ExecuteScalar()!;
-                }
-
-                foreach (var line in _cart)
-                {
-                    using (var cmd = new NpgsqlCommand(
-                        "INSERT INTO productoxventa (producto_id, ventas_id) VALUES (@p, @v)", conn, tx))
-                    {
-                        cmd.Parameters.AddWithValue("p", line.ProductoId);
-                        cmd.Parameters.AddWithValue("v", ventaId);
-                        cmd.ExecuteNonQuery();
-                    }
-
-                    using var linkCmd = new NpgsqlCommand(
-                        "SELECT ingrediente_id FROM ingredientexproducto WHERE producto_id = @p", conn, tx);
-                    linkCmd.Parameters.AddWithValue("p", line.ProductoId);
-
-                    var ingredienteIds = new List<int>();
-                    using (var linkReader = linkCmd.ExecuteReader())
-                    {
-                        while (linkReader.Read())
-                            ingredienteIds.Add(linkReader.GetInt32(0));
-                    }
-
-                    foreach (var ingredienteId in ingredienteIds)
-                    {
-                        using var deductCmd = new NpgsqlCommand(
-                            "UPDATE ingredientes SET cantidad = cantidad - @cant WHERE id = @id", conn, tx);
-                        deductCmd.Parameters.AddWithValue("cant", (decimal)line.Cantidad);
-                        deductCmd.Parameters.AddWithValue("id", ingredienteId);
-                        deductCmd.ExecuteNonQuery();
-                    }
-                }
-
-                tx.Commit();
+                cmd.Parameters.AddWithValue("p", line.ProductoId);
+                cmd.Parameters.AddWithValue("v", ventaId);
+                cmd.Parameters.AddWithValue("c", line.Cantidad);
+                cmd.ExecuteNonQuery();
             }
-            catch
+
+            using var linkCmd = new NpgsqlCommand(
+                "SELECT ingrediente_id FROM ingredientexproducto WHERE producto_id = @p", conn, tx);
+            linkCmd.Parameters.AddWithValue("p", line.ProductoId);
+
+            var ingredienteIds = new List<int>();
+            using (var linkReader = linkCmd.ExecuteReader())
             {
-                tx.Rollback();
-                throw;
+                while (linkReader.Read())
+                    ingredienteIds.Add(linkReader.GetInt32(0));
+            }
+
+            foreach (var ingredienteId in ingredienteIds)
+            {
+                using var deductCmd = new NpgsqlCommand(
+                    "UPDATE ingredientes SET cantidad = cantidad - @cant WHERE id = @id", conn, tx);
+                deductCmd.Parameters.AddWithValue("cant", (decimal)line.Cantidad);
+                deductCmd.Parameters.AddWithValue("id", ingredienteId);
+                deductCmd.ExecuteNonQuery();
             }
         }
+
+        tx.Commit();
+    }
+    catch (Exception)
+    {
+        tx.Rollback();
+        throw;
+    }
+}
 
         private void AddItem_Click(object? sender, RoutedEventArgs e)
         {
@@ -166,22 +167,40 @@ namespace DolcePOSDummies
             UpdateTotal();
         }
 
-        private void Checkout_Click(object? sender, RoutedEventArgs e)
-        {
-            if (_cart.Count == 0)
-                return;
+private void Checkout_Click(object? sender, RoutedEventArgs e)
+{
+    Console.WriteLine($"[1] Checkout start, cart count: {_cart.Count}");
 
-            try
-            {
-                InsertData();
-                _cart.Clear();
-                TotalText.Text = "Sale saved!";
-            }
-            catch (Exception ex)
-            {
-                TotalText.Text = "Checkout failed - see console";
-                Console.WriteLine(ex);
-            }
+    if (_cart.Count == 0)
+        return;
+
+    try
+    {
+        InsertData();
+        Console.WriteLine($"[2] After InsertData, cart count: {_cart.Count}");
+        ShowBill();
+        _cart.Clear();
+        TotalText.Text = "Sale saved!";
+    }
+    catch (Exception ex)
+    {
+        TotalText.Text = "Checkout failed - see console";
+        Console.WriteLine(ex);
+    }
+}
+
+private void ShowBill()
+{
+    Console.WriteLine($"[3] ShowBill start, cart count: {_cart.Count}");
+    var total = _cart.Sum(l => l.Subtotal);
+    var billWindow = new BillWindow(_cart, total);
+    billWindow.Show();
+}
+
+        private void ShowReports_Click(object? sender, RoutedEventArgs e)
+        {
+            var reportWindow = new ReportWindow();
+            reportWindow.Show();
         }
 
         private void UpdateTotal()

@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:DolcePOSDummies"
+        x:Class="DolcePOSDummies.BillWindow"
+        Title="Factura"
+        Width="700" Height="500"
+        MinWidth="500" MinHeight="350"
+        >
+
+    <DockPanel Margin="15">
+        <TextBlock x:Name="BillTitle" Text="FACTURA" FontSize="20" FontWeight="Bold"
+                   DockPanel.Dock="Top" HorizontalAlignment="Center" />
+
+        <TextBlock x:Name="BillDate" Text="Fecha: " DockPanel.Dock="Top"
+                   HorizontalAlignment="Right" FontSize="11" />
+
+        <DataGrid x:Name="BillGrid"
+                  x:DataType="local:VentaLinea"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  GridLinesVisibility="Horizontal"
+                  BorderThickness="1"
+                  BorderBrush="Gray"
+                  Padding="10"
+                  DockPanel.Dock="Top"
+                  VerticalAlignment="Top"
+                  Height="300">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha}" Width="130" />
+                <DataGridTextColumn Header="Producto" Binding="{Binding Producto}" Width="180" />
+                <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad}" Width="70" />
+                <DataGridTextColumn Header="Precio" Binding="{Binding Precio, StringFormat={}{0:C}}" Width="100" />
+                <DataGridTextColumn Header="Subtotal" Binding="{Binding Subtotal, StringFormat={}{0:C}}" Width="100" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+            <TextBlock x:Name="BillTotal" Text="Total: $0.00" FontSize="16" FontWeight="Bold"
+                       VerticalAlignment="Center" />
+            <Button Content="Cerrar" Click="CloseBill_Click" Padding="15,6" Width="100"/>
+        </StackPanel>
+    </DockPanel>
+</Window>
